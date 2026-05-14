@@ -1,5 +1,5 @@
 # template-reactwindvitejs
-template sederhana untuk web vite jsx + tailwind + firebase
+template sederhana untuk web vite jsx + tailwind + react router dom + firebase
 
 cara install
 
