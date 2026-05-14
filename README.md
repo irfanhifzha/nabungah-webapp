@@ -16,7 +16,7 @@ npm run build
 
 npm run dev
 atau
-npm run dev --host
+npm run dev -- --host
 ```
 
 done
