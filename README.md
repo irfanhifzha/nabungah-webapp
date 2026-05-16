@@ -1,7 +1,9 @@
 # template-reactwindvitejs
-template sederhana untuk web vite jsx + tailwind + react router dom + firebase
+
+template sederhana untuk multipage web vite jsx + tailwind + react router dom + firebase
 
 cara install
+
 
 ```
 git clone https://github.com/irfanhku/template-reactwindvitejs
