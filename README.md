@@ -2,6 +2,7 @@
 
 template sederhana untuk multipage web vite jsx + tailwind + react router dom + firebase
 
+req space kurang lebih 100mb
 
 
 ### cara install
@@ -17,7 +18,7 @@ cd template-reactwindvitejs  // lagi
 npm install
 ```
 
-untuk build ke .dist or run local
+untuk build ke dist or run local
 
 ```
 npm run build
@@ -35,7 +36,7 @@ done
 
 
 1. buat file baru di /src/pages, contoh: Newpages.tsx
-2. buat link route baru di src/App.jsx
+2. buat link route baru, edit file /src/App.jsx
 
 ```
 ...
@@ -90,7 +91,7 @@ i add
     ]
   }
 ```
-that code to `firebabse.json` , jadi intinya semua file di /dist yang akan jadi di deploy dan multipage nya akan works dikarenakan ada rewrites.
+that code to `firebabse.json` , jadi intinya semua file di ./dist yang akan jadi di deploy dan multipage nya akan works dikarenakan ada rewrites.
 
 2. sehingga sebelum deploy perlu di build dulu dengan
 
