@@ -70,7 +70,43 @@ docs about firestore: https://firebase.google.com/docs/firestore/manage-database
 
 ### cara deploy multipage ke firebase
 
-1. karena sudah ada semua file needed to deploy (kayaknya), jadi tinggal `firebase deploy`, tapi of course perlu install firebase cli dan set to what project to deploy to.
+0. login to firebase
+
+```
+firebase login
+
+firebase login:ci
+
+firebase login --reauth
+```
+
+1. edit file .firebaserc
+
+```
+{
+  "projects": {
+    "default": "your-project-id" 
+  }
+}
+```
+
+change the "your-project-id", to your project name
+
+setelah itu, coba check dengan type in cmd
+
+```
+firebase use
+
+
+atau (for more info, kalau berhasil itu juga)
+
+firebase projects:list
+```
+
+Dan harusnya project sudah sama dengan di file .firebaserc
+
+
+2. karena sudah ada semua file needed to deploy (kayaknya), jadi tinggal `firebase deploy`, tapi of course perlu install firebase cli dan set to what project to deploy to.
 
 i add
 
