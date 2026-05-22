@@ -1,1 +1,48 @@
 @import "tailwindcss";
+
+button,
+input,
+select,
+textarea {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #000; /* text color */
+  -webkit-box-shadow: 0 0 0px 1000px white inset; /* background fix */
+  transition: background-color 9999s ease-out 0s; /* prevents flash */
+}
+
+:root {
+    /* Base */
+    --white: #ffffff;
+    --black: #111827;
+
+    /* Borders */
+    --border: #e5e7eb;
+    --border-hover:  #d1d5db;
+
+    /* Purple */
+    --purple-bg: #eef2ff;
+    --purple-color: #4f46e5;
+
+    /* Blue */
+    --blue-bg: #e0f2fe;
+    --blue-color: #0284c7;
+
+    /* Green */
+    --green-bg: #dcfce7;
+    --green-color: #16a34a;
+
+    /* Red */
+    --red-bg: #fee2e2;
+    --red-color: #dc2626;
+
+    /* Orange */
+    --orange-bg: #ffedd5;
+    --orange-color: #ea580c;
+}
