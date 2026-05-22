@@ -13,8 +13,6 @@ git clone https://github.com/irfanhku/template-reactwindvitejs
 
 cd template-reactwindvitejs
 
-cd template-reactwindvitejs  // lagi
-
 npm install
 ```
 
