@@ -2,6 +2,108 @@
 
 webapp untuk nabung dan monitoring keuangan lainnya
 
+TODO
+0. add limiation uang minus
+1. nanti add export to clipboard info statistik
+2. add fungsi tuker uang cash -> dana atau yg lain (ga keitung income)
+
+```
+start of firestore structure
+
+users (collection)
+└── {uid} (document) → example: "uid_abc123"
+    ├── name: string = "Ivan"
+    ├── email: string = "ivan@gmail.com"
+    ├── createdAt: timestamp = 2026-05-23T10:00:00Z
+
+    ├── wallets (collection)
+    │   └── {walletId} (document) → example: "wallet_cash"
+    │       ├── name: string = "Cash"
+    │       ├── balance: int64 = 1500000
+    │       ├── createdAt: timestamp = 2026-05-01T10:00:00Z
+    │       └── updatedAt: timestamp = 2026-05-23T12:00:00Z
+    │
+    │   └── {walletId} → example: "wallet_dana"
+    │       ├── name: string = "Dana"
+    │       ├── balance: int64 = 2000000
+    │       ├── createdAt: timestamp = 2026-05-01T10:00:00Z
+    │       └── updatedAt: timestamp = 2026-05-23T12:00:00Z
+
+    ├── transactions (collection)
+    │   └── {transactionId} → example: "trx_001"
+    │       ├── title: string = "Gaji Bulanan"
+    │       ├── amount: int64 = 7000000
+    │       ├── type: string = "income"
+    │       ├── walletId: string = "wallet_dana"
+    │       ├── note: string = ""
+    │       ├── date: timestamp = 2026-05-23T08:00:00Z
+    │       ├── month: string = "2026-05"
+    │       ├── year: int64 = 2026
+    │       └── createdAt: timestamp = 2026-05-23T08:00:00Z
+    │
+    │   └── {transactionId} → example: "trx_002"
+    │       ├── title: string = "Belanja"
+    │       ├── amount: int64 = 85000
+    │       ├── type: string = "expense"
+    │       ├── walletId: string = "wallet_cash"
+    │       ├── note: string = "ini isi optional"
+    │       ├── date: timestamp = 2026-05-23T12:00:00Z
+    │       ├── month: string = "2026-05"
+    │       ├── year: int64 = 2026
+    │       └── createdAt: timestamp = 2026-05-23T12:00:00Z
+
+    ├── quickactions (collection)
+    │   └── {actionId} → example: "salary"
+    │       ├── title: string = "Gaji Bulanan"
+    │       ├── type: string = "income"
+    │       ├── amount: int64 = 7000000
+    │       ├── createdAt: timestamp = 2026-05-01T00:00:00Z
+    │       └── updatedAt: timestamp = 2026-05-01T00:00:00Z
+    │
+    │   └── {actionId} → example: "bensin"
+    │       ├── title: string = "Isi Bensin (Rp. 20.000rb)"
+    │       ├── type: string = "expense"
+    │       ├── amount: int64 = 20000
+    │       └── createdAt: timestamp = 2026-05-01T00:00:00Z
+    │       └── updatedAt: timestamp = 2026-05-01T00:00:00Z
+
+    ├── goals (collection)
+    │   └── {goalId} → example: "goal_macbook"
+    │       ├── title: string = "MacBook M3"
+    │       ├── targetAmount: int64 = 25000000
+    │       ├── savedAmount: int64 = 5000000
+    │       ├── status: string = "in_progress"
+    │       └── createdAt: timestamp = 2026-05-01T00:00:00Z
+
+    └── datas (collection)
+        └── {monthId} → example: "2026-05"
+            ├── month: string = "2026-05"
+            ├── totalBalance: int64 = 5500000
+            ├── totalIncome: int64 = 7000000
+            ├── totalExpense: int64 = 1500000
+            ├── feeExpense: int64 = 37500
+            ├── feePercent: double = 2.5
+            └── updatedAt: timestamp = 2026-05-23T12:00:00Z
+
+
+end of firestore
+
+```
+
+
+```
+git clone
+
+cd nabungah-webapp
+
+npm install
+
+-
+
+npm run build
+
+npm run dev
+
 ---
 
 

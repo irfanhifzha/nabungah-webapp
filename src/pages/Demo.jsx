@@ -1,4 +1,20 @@
+import { signOut } from "firebase/auth";
+import { auth } from "../lib/firebase";
+import { useNavigate } from "react-router-dom";
+
 export default function Home() {
+
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    localStorage.removeItem("token"); // kalau kamu pakai guard
+    navigate("/login");
+  };
+
+  const addwallet = navigate("/");
+
+
   return (
     <>
       <div className="min-h-screen bg-[#f5f7fb] flex justify-center items-center p-4">
@@ -15,9 +31,10 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center text-lg font-semibold">
+            <button className="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center text-lg font-semibold transition duration-200 hover:bg-gray-800 hover:-translate-y-2 cursor-pointer"
+            onClick={handleLogout}>
               I
-            </div>
+            </button>
 
           </div>
 
@@ -43,16 +60,21 @@ export default function Home() {
               Rp 10.000
             </h1>
 
+            <button className="p-3  my-5 rounded-2xl bg-black text-white flex items-center justify-center text-lg font-semibold transition duration-200 hover:bg-gray-800 hover:-translate-y-2 cursor-pointer"
+            onClick={addwallet}>
+              + add wallets
+            </button>
+
             
 
           </section>
 
 
-          {/* QUICK STATS */}
+          {/* GENERAL ACTION */}
           <section className="grid grid-cols-2 gap-4">
 
             {/* INCOME */}
-            <div className="bg-white items-center flex flex-col h-fit border border-gray-200 rounded-[24px] p-5 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
+            <button className="bg-white items-center flex flex-col h-fit border border-gray-200 rounded-[24px] p-5 shadow-[0_4px_10px_rgba(0,0,0,0.05)] transition duration-200 hover:bg-gray-200 hover:-translate-y-2 cursor-pointer">
 
               <div className="w-10 h-10 rounded-2xl bg-green-100 flex items-center justify-center">
                 📈
@@ -61,10 +83,10 @@ export default function Home() {
               <p className="text-sm text-gray-500 mt-2">
                 Pemasukan
               </p>
-            </div>
+            </button>
 
             {/* EXPENSE */}
-            <div className="bg-white items-center flex flex-col h-fit border border-gray-200 rounded-[24px] p-5 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
+            <button className="bg-white items-center flex flex-col h-fit border border-gray-200 rounded-[24px] p-5 shadow-[0_4px_10px_rgba(0,0,0,0.05)] transition duration-200 hover:bg-gray-200 hover:-translate-y-2 cursor-pointer">
 
               <div className="w-10 h-10 rounded-2xl bg-red-100 flex items-center justify-center">
                 📉
@@ -73,7 +95,45 @@ export default function Home() {
               <p className="text-sm text-gray-500 mt-2">
                 Pengeluaran
               </p>
-            </div>
+            </button>
+
+          </section>
+
+
+          {/* QUICK ACTIOn LIST */}
+          <section className="bg-white border border-gray-200 rounded-[24px] p-5 shadow-[0_4px_10px_rgba(0,0,0,0.05)] flex-1">
+
+            <h2 className="font-bold mb-5">Quick Action</h2>
+
+              <button className="bg-white items-center flex flex-col h-fit border border-gray-200 rounded-[24px] p-5 shadow-[0_4px_10px_rgba(0,0,0,0.05)] transition duration-200 hover:bg-gray-200 hover:-translate-y-2 cursor-pointer">
+
+              <p className="text-md font-bold text-gray-500">
+                Gaji Bulanan
+              </p>
+
+              <p>
+                {/* type field in quickaction */}
+                <span>+</span>
+
+                {/* amount */}
+                <span className="ms-1">Rp. 700.000</span>
+              </p>
+            </button>
+
+            <button className="bg-white items-center flex flex-col h-fit border border-gray-200 rounded-[24px] p-5 shadow-[0_4px_10px_rgba(0,0,0,0.05)] transition duration-200 hover:bg-gray-200 hover:-translate-y-2 cursor-pointer">
+
+              <p className="text-md font-bold text-gray-500">
+                Isi Bensin
+              </p>
+
+              <p>
+                {/* type field in quickaction */}
+                <span>-</span>
+
+                {/* amount */}
+                <span className="ms-1">Rp. 20.000</span>
+              </p>
+            </button>
 
           </section>
 
@@ -181,22 +241,27 @@ export default function Home() {
           {/* BOTTOM NAV */}
           <nav className="bg-white border border-gray-200 rounded-[24px] p-3 shadow-[0_4px_10px_rgba(0,0,0,0.05)] flex justify-around items-center">
 
+            {/* dashboard - firestore quickaction subcol */}
             <button className="bg-white border border-blue-300  text-white w-14 h-14 rounded-2xl flex items-center justify-center text-xl">
               🏠
             </button>
 
+            {/* data wallets and balance - firestore data subcol */}
             <button className="text-xl">
               📊
             </button>
 
+            {/* all income-expenses sort by month - firestore transaction subcol */}
             <button className="text-xl">
-              ➕
+              📅
             </button>
 
+            {/* goals - firestore goals subcol */}
             <button className="text-xl">
               🎯
             </button>
 
+            {/* user setting */}
             <button className="text-xl">
               👤
             </button>
@@ -209,3 +274,4 @@ export default function Home() {
     </>
   )
 }
+

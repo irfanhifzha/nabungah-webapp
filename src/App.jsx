@@ -1,19 +1,29 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
-import About from "./pages/About"
+
+import Demo from "./pages/Demo";
+
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
-
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
 
-        <Route path="/About" element={<About />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
 
-
+        <Route path="/demo" element={<Demo />} />
 
         {/* 404 route */}
         <Route path="*" element={<NotFound />} />
