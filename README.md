@@ -17,6 +17,28 @@ TODO
 9. ...
 10. ...
 
+
+my qa
+
+- if i want to start over .git and change the remote repo to another new fresh from start, what should i do? delete .git ? and do fresh git init? or what
+- can firebase react vite js connect to google spreadsheet?
+- is it hard to change stack from react vite firebase firestore to react native app that connect with firestore when online
+- so if react web do an 'npm run build' what react native do ?
+-> So if your React Native project folder is 500 MB, that absolutely does not mean users install a 500 MB app.
+
+```
+You can check actual production size with:
+
+cd android
+./gradlew assembleRelease
+```
+- so if react web do an 'npm run build' what react native do ?
+
+
+
+
+
+
 ```
 start of firestore structure
 
