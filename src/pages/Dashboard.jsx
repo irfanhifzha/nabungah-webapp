@@ -24,6 +24,7 @@ import EditGoalModal from "../components/modals/EditGoalModal";
 import DeleteQAModal from "../components/modals/DeleteQAModal";
 import DeleteTrxModal from "../components/modals/DeleteTrxModal";
 import DeleteWalletModal from "../components/modals/DeleteWalletModal";
+import DeleteDataModal from "../components/modals/DeleteDataModal";
 
 export default function Dashboard() {
   const [uid, setUid] = useState(null);
@@ -46,6 +47,7 @@ export default function Dashboard() {
   const [showDeleteQAModal, setShowDeleteQAModal] = useState(false);
   const [showDeleteTrxModal, setShowDeleteTrxModal] = useState(false);
   const [showDeleteWalletModal, setShowDeleteWalletModal] = useState(false);
+  const [showDeleteDataModal, setShowDeleteDataModal] = useState(false);
 
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [selectedQuickAction, setSelectedQuickAction] = useState(null);
@@ -580,9 +582,20 @@ export default function Dashboard() {
         {/* MONTHLY HISTORY (FROM FIRESTORE) */}
         <section className="border rounded-2xl p-4">
 
-          <h2 className="font-bold">
-            Monthly History
-          </h2>
+          <div className="flex justify-between items-center">
+            <h2 className="font-bold">
+              Monthly History
+            </h2>
+
+            <button className="bg-white border border-gray-600 text-white text-xs px-2 py-1 rounded-full select-none active:scale-95"
+            onClick={() => {
+              setShowDeleteDataModal(true);
+            }}>
+              🗑️
+            </button>
+            {/* sampah or trash */}
+          </div>
+
 
           <p className="text-gray-500 text-sm">
             Stored snapshot per month (Firestore datas)
@@ -687,6 +700,13 @@ export default function Dashboard() {
         onClose={() => setShowDeleteWalletModal(false)}
         wallets={wallets}
       />
+
+      <DeleteDataModal
+        open={showDeleteDataModal}
+        onClose={() => setShowDeleteDataModal(false)}
+        monthlyData={monthlyData}
+      />
+
 
 
 

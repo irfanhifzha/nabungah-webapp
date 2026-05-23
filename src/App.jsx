@@ -4,8 +4,6 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
-import Demo from "./pages/Demo";
-
 import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
@@ -23,7 +21,6 @@ function App() {
           }
         />
 
-        <Route path="/demo" element={<Demo />} />
 
         {/* 404 route */}
         <Route path="*" element={<NotFound />} />
