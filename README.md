@@ -35,9 +35,12 @@ cd android
 - so if react web do an 'npm run build' what react native do ?
 
 
+<br></br>
 
+--- 
+---
 
-
+<br></br>
 
 ```
 start of firestore structure
