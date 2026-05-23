@@ -23,6 +23,7 @@ import GoalModal from "../components/modals/GoalModal";
 import EditGoalModal from "../components/modals/EditGoalModal";
 import DeleteQAModal from "../components/modals/DeleteQAModal";
 import DeleteTrxModal from "../components/modals/DeleteTrxModal";
+import DeleteWalletModal from "../components/modals/DeleteWalletModal";
 
 export default function Dashboard() {
   const [uid, setUid] = useState(null);
@@ -43,6 +44,7 @@ export default function Dashboard() {
   const [showEditGoalModal, setShowEditGoalModal] = useState(false);
   const [showDeleteQAModal, setShowDeleteQAModal] = useState(false);
   const [showDeleteTrxModal, setShowDeleteTrxModal] = useState(false);
+  const [showDeleteWalletModal, setShowDeleteWalletModal] = useState(false);
 
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [selectedQuickAction, setSelectedQuickAction] = useState(null);
@@ -189,12 +191,23 @@ export default function Dashboard() {
             Logout
           </button>
         </div>
+        
 
         {/* WALLETS */}
         <section className="border rounded-2xl p-4">
 
           <div className="flex justify-between mb-3">
-            <h2 className="font-bold">Wallets</h2>
+            <h2 className="font-bold me-18">Wallets</h2>
+
+            <button className="bg-white border border-gray-600 text-white text-xs px-2 py-1 rounded-full select-none active:scale-95"
+            onClick={() => {
+              setShowDeleteWalletModal(true);
+            }}>
+              🗑️
+            </button>
+            {/* sampah or trash */}
+
+
             <button
               onClick={() => setShowExchangeBalanceModal(true)}
               className="text-xs bg-black text-white px-3 py-1 rounded-full active:scale-95"
@@ -591,6 +604,12 @@ export default function Dashboard() {
         open={showDeleteTrxModal}
         onClose={() => setShowDeleteTrxModal(false)}
         transactions={transactions}
+      />
+
+      <DeleteWalletModal
+        open={showDeleteWalletModal}
+        onClose={() => setShowDeleteWalletModal(false)}
+        wallets={wallets}
       />
 
 

@@ -36,6 +36,12 @@ export default function MonthSyncModal({ open, onClose, data, uid }) {
   const handleSave = async () => {
     if (!uid) return;
 
+    const confirming = window.confirm(
+      "Are you sure you want to save?"
+    );
+
+    if (!confirming) return;
+
     await setDoc(doc(db, "users", uid, "datas", form.month), {
       ...form,
       updatedAt: serverTimestamp(),

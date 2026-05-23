@@ -7,10 +7,10 @@ import {
   writeBatch,
 } from "firebase/firestore";
 
-export default function DeleteQAModal({
+export default function DeleteWalletModal({
   open,
   onClose,
-  quickActions,
+  wallets,
 }) {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -31,13 +31,13 @@ export default function DeleteQAModal({
     setError("");
 
     if (!selected) {
-      setError("Select quick action first");
+      setError("Select wallet first");
       setLoading(false);
       return;
     }
 
     const confirmDelete = window.confirm(
-      `Are you sure you want to remove Quick Action "${selected.title}"?`
+      `Delete wallet "${selected.name}"?`
     );
 
     if (!confirmDelete) {
@@ -54,13 +54,13 @@ export default function DeleteQAModal({
       }
 
       await deleteDoc(
-        doc(db, "users", uid, "quickactions", selected.id)
+        doc(db, "users", uid, "wallets", selected.id)
       );
 
       onClose();
     } catch (err) {
       console.error(err);
-      setError("Failed to delete item");
+      setError("Failed to delete wallet");
     } finally {
       setLoading(false);
     }
@@ -70,13 +70,13 @@ export default function DeleteQAModal({
     setLoading(true);
     setError("");
 
-    if (quickActions.length === 0) {
+    if (wallets.length === 0) {
       setLoading(false);
       return;
     }
 
     const confirmDelete = window.confirm(
-      "Are you sure you want to remove all Quick Actions?"
+      "Are you sure you want to delete ALL wallets?"
     );
 
     if (!confirmDelete) {
@@ -94,8 +94,8 @@ export default function DeleteQAModal({
 
       const batch = writeBatch(db);
 
-      quickActions.forEach((q) => {
-        const ref = doc(db, "users", uid, "quickactions", q.id);
+      wallets.forEach((w) => {
+        const ref = doc(db, "users", uid, "wallets", w.id);
         batch.delete(ref);
       });
 
@@ -104,7 +104,7 @@ export default function DeleteQAModal({
       onClose();
     } catch (err) {
       console.error(err);
-      setError("Failed to delete all");
+      setError("Failed to delete all wallets");
     } finally {
       setLoading(false);
     }
@@ -112,13 +112,17 @@ export default function DeleteQAModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+
       <div className="bg-white w-full max-w-[340px] rounded-[28px] p-5 shadow flex flex-col gap-4">
 
         {/* HEADER */}
         <div>
-          <h2 className="text-xl font-bold">Delete Quick Actions</h2>
+          <h2 className="text-xl font-bold">
+            Delete Wallets
+          </h2>
+
           <p className="text-sm text-gray-500 mt-1">
-            Select or delete all items
+            Select wallet or delete all
           </p>
         </div>
 
@@ -130,42 +134,45 @@ export default function DeleteQAModal({
         )}
 
         {/* LIST */}
-        <div className="flex flex-col gap-2 max-h-[200px] overflow-y-auto">
-          {quickActions.length === 0 && (
+        <div className="flex flex-col gap-2 max-h-[220px] overflow-y-auto">
+
+          {wallets.length === 0 && (
             <p className="text-sm text-gray-400">
-              No quick actions
+              No wallets
             </p>
           )}
 
-          {quickActions.map((q) => (
+          {wallets.map((w) => (
             <button
-              key={q.id}
-              onClick={() => setSelected(q)}
+              key={w.id}
+              onClick={() => setSelected(w)}
               className={`text-left p-3 rounded-xl border transition ${
-                selected?.id === q.id
+                selected?.id === w.id
                   ? "border-black bg-gray-100"
                   : "border-gray-200"
               }`}
             >
-              <p className="font-semibold text-sm">{q.title}</p>
-              <p className={`text-xs capitalize ${
-                  q.type === "income"
-                    ? "text-green-600"
-                    : q.type === "expense"
-                    ? "text-red-500"
-                    : "text-gray-400"
-                }`}
-              >
-                {q.type} • Rp {Number(q.amount).toLocaleString("id-ID")}
+              <p className="font-semibold text-sm">
+                {w.name}
+              </p>
+
+              <p className="text-xs text-gray-500">
+                Rp {Number(w.balance || 0).toLocaleString("id-ID")}
               </p>
             </button>
           ))}
+
         </div>
+
+        {/* SAFETY WARNING */}
+        <p className="text-[11px] text-gray-400">
+          ⚠️ Deleting a wallet will NOT move its balance. Make sure it's empty.
+        </p>
 
         {/* ACTIONS */}
         <div className="flex flex-col gap-2 mt-2">
 
-          {quickActions.length > 0 && (
+          {wallets.length > 0 && (
             <button
               onClick={handleDeleteAll}
               disabled={loading}
@@ -193,6 +200,7 @@ export default function DeleteQAModal({
             </button>
 
           </div>
+
         </div>
 
       </div>
