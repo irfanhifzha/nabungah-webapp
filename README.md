@@ -3,10 +3,10 @@
 webapp untuk nabung dan monitoring keuangan lainnya
 
 TODO
-0. add limiation uang minus
+~~0. add limiation uang minus~~
 1. nanti add export to clipboard info statistik
-2. add fungsi tuker uang cash -> dana atau yg lain (ga keitung income)
-3. tambah goal info dan firestore connect modal
+~~2. add fungsi tuker uang cash -> dana atau yg lain (ga keitung income)~~
+~~3. tambah goal info dan firestore connect modal~~
 4. tambah crud button (UTAMANYA DELETE DAN ADD) untuk recent transact and utk quick action and utk wallet
 5. animasi modal and aos?
 6. ...
