@@ -252,9 +252,26 @@ export default function Dashboard() {
                       {trx.title}
                     </p>
 
+                    
+
+                     <p className="text-xs text-gray-500">
+                      {new Date(trx.date?.toDate ? trx.date.toDate() : trx.date)
+                        .toLocaleString("id-ID", {
+                          weekday: "short",
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: false,
+                        })
+                        .replace(".", ":")}
+                    </p>
+
                     <p className="text-xs text-gray-500">
                       {walletName}
                     </p>
+
                   </div>
 
                   <p
