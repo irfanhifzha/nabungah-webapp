@@ -34,6 +34,7 @@ export default function Dashboard() {
   const [quickActions, setQuickActions] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [goals, setGoals] = useState([]);
+  const [monthlyData, setMonthlyData] = useState([]);
 
   // MODALS
   const [showWalletModal, setShowWalletModal] = useState(false);
@@ -62,7 +63,6 @@ export default function Dashboard() {
   useEffect(() => {
     if (!uid) return;
 
-    
     const userRef = doc(db, "users", uid);
 
     const unsubUser = onSnapshot(userRef, (snap) => {
@@ -78,6 +78,8 @@ export default function Dashboard() {
       orderBy("date", "desc"),
       limit(20)
     );
+
+    const datasRef = collection(db, "users", uid, "datas");
 
     const unsubWallets = onSnapshot(walletRef, (snap) => {
       setWallets(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
@@ -95,82 +97,89 @@ export default function Dashboard() {
       setGoals(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
 
+    const unsubDatas = onSnapshot(datasRef, (snap) => {
+      setMonthlyData(
+        snap.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }))
+      );
+    });
+
     return () => {
       unsubUser();
       unsubWallets();
       unsubQA();
       unsubTrx();
       unsubGoal();
+      unsubDatas();
+      };
+    }, [uid]);
+
+    const handleLogout = async () => {
+      await signOut(auth);
     };
-  }, [uid]);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
+    // =========================
+    // DATE HELPERS
+    // =========================
+    const now = new Date();
+    const monthId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-  // =========================
-  // 🔥 DATE HELPERS
-  // =========================
-  const now = new Date();
-  const monthId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    // =========================
+    // TOTAL BALANCE
+    // =========================
+    const totalBalance = useMemo(() => {
+      return wallets.reduce((acc, w) => acc + Number(w.balance || 0), 0);
+    }, [wallets]);
 
-  // =========================
-  // 🔥 COMPUTED TOTAL BALANCE
-  // =========================
-  const totalBalance = useMemo(() => {
-    return wallets.reduce((acc, w) => acc + Number(w.balance || 0), 0);
-  }, [wallets]);
+    // =========================
+    // MONTH FILTER
+    // =========================
+    const monthlyTransactions = useMemo(() => {
+      return transactions.filter((t) => {
+        if (!t.date?.toDate) return false;
+        const d = t.date.toDate();
+        const id = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        return id === monthId;
+      });
+    }, [transactions, monthId]);
 
-  // =========================
-  // 🔥 MONTH FILTER
-  // =========================
-  const monthlyTransactions = useMemo(() => {
-    return transactions.filter((t) => {
-      if (!t.date?.toDate) return false;
-      const d = t.date.toDate();
-      const id = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      return id === monthId;
-    });
-  }, [transactions, monthId]);
+    const totalIncome = useMemo(() => {
+      return monthlyTransactions
+        .filter((t) => t.type === "income")
+        .reduce((acc, t) => acc + Number(t.amount || 0), 0);
+    }, [monthlyTransactions]);
 
-  const totalIncome = useMemo(() => {
-    return monthlyTransactions
-      .filter((t) => t.type === "income")
-      .reduce((acc, t) => acc + Number(t.amount || 0), 0);
-  }, [monthlyTransactions]);
+    const totalExpense = useMemo(() => {
+      return monthlyTransactions
+        .filter((t) => t.type === "expense")
+        .reduce((acc, t) => acc + Number(t.amount || 0), 0);
+    }, [monthlyTransactions]);
 
-  const totalExpense = useMemo(() => {
-    return monthlyTransactions
-      .filter((t) => t.type === "expense")
-      .reduce((acc, t) => acc + Number(t.amount || 0), 0);
-  }, [monthlyTransactions]);
+    const [feePercent, setFeePercent] = useState(2.5);
 
-  // default fee percent (can later come from Firestore settings)
-  const [feePercent, setFeePercent] = useState(2.5);
+    const feeExpense = useMemo(() => {
+      return Math.round((totalIncome * feePercent) / 100);
+    }, [totalIncome, feePercent]);
 
-  const feeExpense = useMemo(() => {
-    return Math.round((totalIncome * feePercent) / 100);
-  }, [totalIncome, feePercent]);
+    const [showMonthSyncModal, setShowMonthSyncModal] = useState(false);
 
+    const monthDataForSync = {
+      month: monthId,
+      totalBalance,
+      totalIncome,
+      totalExpense,
+      feePercent,
+      feeExpense,
+    };
 
-  // NEW FOR DATA MONTHLY
-
-  const [showMonthSyncModal, setShowMonthSyncModal] = useState(false);
-
-  const monthDataForSync = {
-    month: monthId,
-    totalBalance,
-    totalIncome,
-    totalExpense,
-    feePercent,
-    feeExpense,
-  };
-
-
-
-
-
-
+    // =========================
+    // SORT MONTHLY DATA (FIXED)
+    // =========================
+    const sortedMonthlyData = useMemo(() => {
+      return [...monthlyData].sort((a, b) => (a.month < b.month ? 1 : -1));
+    }, [monthlyData]);
 
   return (
     <div className="min-h-screen bg-[#f5f7fb] flex justify-center items-center p-4">
@@ -566,6 +575,73 @@ export default function Dashboard() {
           </div>
 
         </section>
+
+        {/* PREV MONTH DATA */}
+        {/* MONTHLY HISTORY (FROM FIRESTORE) */}
+        <section className="border rounded-2xl p-4">
+
+          <h2 className="font-bold">
+            Monthly History
+          </h2>
+
+          <p className="text-gray-500 text-sm">
+            Stored snapshot per month (Firestore datas)
+          </p>
+
+          <div className="mt-3 flex flex-col gap-3">
+
+            {sortedMonthlyData.length === 0 && (
+              <p className="text-sm text-gray-400">
+                No monthly snapshots yet
+              </p>
+            )}
+
+            {sortedMonthlyData.map((m) => (
+              <div
+                key={m.id}
+                className="border rounded-xl p-3 bg-white"
+              >
+
+                {/* MONTH */}
+                <p className="font-bold text-sm">
+                  {m.month}
+                </p>
+
+                {/* INCOME / EXPENSE */}
+                <div className="flex justify-between text-xs mt-2">
+                  <span className="text-green-500">
+                    + Rp {Number(m.totalIncome || 0).toLocaleString("id-ID")}
+                  </span>
+
+                  <span className="text-red-500">
+                    - Rp {Number(m.totalExpense || 0).toLocaleString("id-ID")}
+                  </span>
+                </div>
+
+                {/* BALANCE */}
+                <p className="text-xs mt-1 text-blue-500 font-semibold">
+                  Balance: Rp {Number(m.totalBalance || 0).toLocaleString("id-ID")}
+                </p>
+
+                {/* FEE */}
+                <p className="text-xs mt-1 text-purple-500">
+                  Fee: Rp {Number(m.feeExpense || 0).toLocaleString("id-ID")} ({m.feePercent}%)
+                </p>
+
+                {/* UPDATED */}
+                <p className="text-[10px] text-gray-400 mt-1">
+                  Updated: {m.updatedAt?.toDate?.().toLocaleString?.("id-ID")}
+                </p>
+
+              </div>
+            ))}
+
+          </div>
+
+        </section>
+
+
+
 
       </div>
 

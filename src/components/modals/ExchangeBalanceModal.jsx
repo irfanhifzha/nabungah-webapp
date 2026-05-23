@@ -57,6 +57,8 @@ export default function ExchangeBalanceModal({
   const handleSubmit = async () => {
     setLoading(true);
 
+   
+
     try {
       const uid = auth.currentUser?.uid;
 
@@ -84,6 +86,8 @@ export default function ExchangeBalanceModal({
 
       setError("");
 
+      
+
       // 🔥 FIRESTORE SOURCE OF TRUTH (FROM WALLET)
       const fromRef = doc(db, "users", uid, "wallets", walletIdAsal);
       const fromSnap = await getDoc(fromRef);
@@ -98,6 +102,14 @@ export default function ExchangeBalanceModal({
 
       if (fromBalance < amt) {
         setError("Insufficient wallet balance");
+        return;
+      }
+
+      const confirming = window.confirm(
+        "Are you sure you want to save?"
+      );
+      if (!confirming) {
+        setLoading(false);
         return;
       }
 
