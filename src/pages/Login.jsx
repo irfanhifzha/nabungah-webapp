@@ -1,3 +1,5 @@
+import Logos from "../assets/icon.png"
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -73,6 +75,12 @@ export default function Login() {
 
         {/* HEADER */}
         <div className="text-center">
+
+          <div className="flex justify-center p-3">
+            <img src={Logos} className="h-[30px]"></img>
+            
+          </div>
+
           <h1 className="text-2xl font-bold text-black">
             Welcome Back
           </h1>

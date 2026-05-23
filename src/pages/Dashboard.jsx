@@ -1,3 +1,5 @@
+import Logos from "../assets/icon.png";
+
 import { signOut } from "firebase/auth";
 import { auth, db } from "../lib/firebase";
 
@@ -147,7 +149,7 @@ export default function Dashboard() {
         {/* HEADER */}
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-sm text-gray-500">📝 Nabungah</p>
+            <img src={Logos} className="h-[30px]"></img>
             <p className="text-sm text-gray-500">Halo user</p>
           </div>
 
