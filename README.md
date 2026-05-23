@@ -13,6 +13,9 @@ TODO
 5. animasi modal and aos?
 6. input click "enter" for submit/save
 7. ...
+8. how to `firestore offline - sync when online` OR change build to `react native - sync when online` OR connect to google spreadsheet?
+9. ...
+10. ...
 
 ```
 start of firestore structure
