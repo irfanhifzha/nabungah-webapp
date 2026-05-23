@@ -20,6 +20,7 @@ export default function TransactionModal({
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("expense");
   const [walletId, setWalletId] = useState("");
+  const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -127,7 +128,7 @@ export default function TransactionModal({
           amount: amt,
           type,
           walletId,
-          note: "",
+          note,
           month,
           year,
           date: serverTimestamp(),
@@ -265,6 +266,27 @@ export default function TransactionModal({
             ))}
           </select>
         </div>
+
+
+        {/* NOTE OPTIONAL */}
+        <div className="flex flex-col gap-1">
+          <label className="text-sm text-gray-500">
+            Note (Optional)
+          </label>
+
+          <input
+            type="text"
+            placeholder="Note tambahan (jika ada)"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="border border-gray-200 rounded-xl p-3 outline-none focus:border-black"
+          />
+        </div>
+
+        
+
+
+
 
         {/* ACTIONS */}
         <div className="flex gap-2 mt-2">

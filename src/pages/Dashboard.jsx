@@ -28,7 +28,6 @@ import DeleteDataModal from "../components/modals/DeleteDataModal";
 
 export default function Dashboard() {
   const [uid, setUid] = useState(null);
-
   const [username, setUsername] = useState(null);
 
   const [wallets, setWallets] = useState([]);
@@ -52,6 +51,58 @@ export default function Dashboard() {
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [selectedQuickAction, setSelectedQuickAction] = useState(null);
 
+  // =========================
+  // COPY TO CLIPBOARD
+  // =========================
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Copied ✅");
+    } catch (err) {
+      console.error("Copy failed:", err);
+    }
+  };
+
+  // FORMAT TRANSACTION
+  const formatTransaction = (trx, walletName = "Unknown Wallet") => {
+    const date = trx.date?.toDate ? trx.date.toDate() : new Date(trx.date);
+
+    return `
+    📊 Data Transaksi
+
+    🧾 Title: ${trx.title}
+    💰 Amount: Rp ${Number(trx.amount).toLocaleString("id-ID")}
+    📌 Type: ${trx.type}
+    🏦 Wallet: ${walletName}
+    🗓️ Date: ${date.toLocaleString("id-ID", {
+          weekday: "short",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+    📝 Note: ${trx.note || "-"}
+    `.trim();
+      };
+
+      // FORMAT MONTHLY DATA
+      const formatMonthlyData = (m) => {
+        return `
+    📊 Data Statistik Keuangan
+
+    📅 Month: ${m.month}
+
+    💰 Total Income: Rp ${Number(m.totalIncome || 0).toLocaleString("id-ID")}
+    💸 Total Expense: Rp ${Number(m.totalExpense || 0).toLocaleString("id-ID")}
+    💼 Total Balance: Rp ${Number(m.totalBalance || 0).toLocaleString("id-ID")}
+
+    💳 Fee (${m.feePercent}%): Rp ${Number(m.feeExpense || 0).toLocaleString("id-ID")}
+
+    🕒 Updated: ${m.updatedAt?.toDate?.()?.toLocaleString("id-ID") || "-"}
+    `.trim();
+      };
+
   // AUTH
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((user) => {
@@ -61,7 +112,7 @@ export default function Dashboard() {
     return () => unsub();
   }, []);
 
-  // FIRESTORE LISTENERS
+  // FIRESTORE
   useEffect(() => {
     if (!uid) return;
 
@@ -100,12 +151,7 @@ export default function Dashboard() {
     });
 
     const unsubDatas = onSnapshot(datasRef, (snap) => {
-      setMonthlyData(
-        snap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }))
-      );
+      setMonthlyData(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
 
     return () => {
@@ -122,22 +168,14 @@ export default function Dashboard() {
       await signOut(auth);
     };
 
-    // =========================
-    // DATE HELPERS
-    // =========================
     const now = new Date();
     const monthId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-    // =========================
-    // TOTAL BALANCE
-    // =========================
-    const totalBalance = useMemo(() => {
-      return wallets.reduce((acc, w) => acc + Number(w.balance || 0), 0);
-    }, [wallets]);
+    const totalBalance = useMemo(
+      () => wallets.reduce((acc, w) => acc + Number(w.balance || 0), 0),
+      [wallets]
+    );
 
-    // =========================
-    // MONTH FILTER
-    // =========================
     const monthlyTransactions = useMemo(() => {
       return transactions.filter((t) => {
         if (!t.date?.toDate) return false;
@@ -147,25 +185,34 @@ export default function Dashboard() {
       });
     }, [transactions, monthId]);
 
-    const totalIncome = useMemo(() => {
-      return monthlyTransactions
-        .filter((t) => t.type === "income")
-        .reduce((acc, t) => acc + Number(t.amount || 0), 0);
-    }, [monthlyTransactions]);
+    const totalIncome = useMemo(
+      () =>
+        monthlyTransactions
+          .filter((t) => t.type === "income")
+          .reduce((a, t) => a + Number(t.amount || 0), 0),
+      [monthlyTransactions]
+    );
 
-    const totalExpense = useMemo(() => {
-      return monthlyTransactions
-        .filter((t) => t.type === "expense")
-        .reduce((acc, t) => acc + Number(t.amount || 0), 0);
-    }, [monthlyTransactions]);
+    const totalExpense = useMemo(
+      () =>
+        monthlyTransactions
+          .filter((t) => t.type === "expense")
+          .reduce((a, t) => a + Number(t.amount || 0), 0),
+      [monthlyTransactions]
+    );
 
     const [feePercent, setFeePercent] = useState(2.5);
 
-    const feeExpense = useMemo(() => {
-      return Math.round((totalIncome * feePercent) / 100);
-    }, [totalIncome, feePercent]);
+    const feeExpense = useMemo(
+      () => Math.round((totalIncome * feePercent) / 100),
+      [totalIncome, feePercent]
+    );
 
     const [showMonthSyncModal, setShowMonthSyncModal] = useState(false);
+
+    const sortedMonthlyData = useMemo(() => {
+      return [...monthlyData].sort((a, b) => (a.month < b.month ? 1 : -1));
+    }, [monthlyData]);
 
     const monthDataForSync = {
       month: monthId,
@@ -175,13 +222,6 @@ export default function Dashboard() {
       feePercent,
       feeExpense,
     };
-
-    // =========================
-    // SORT MONTHLY DATA (FIXED)
-    // =========================
-    const sortedMonthlyData = useMemo(() => {
-      return [...monthlyData].sort((a, b) => (a.month < b.month ? 1 : -1));
-    }, [monthlyData]);
 
   return (
     <div className="min-h-screen bg-[#f5f7fb] flex justify-center items-center p-4">
@@ -461,7 +501,10 @@ export default function Dashboard() {
             </p>
           }
 
-          <div className="flex flex-col gap-3">
+          <div className="relative flex flex-col gap-3 border border-black p-4 rounded-2xl">
+
+            
+            
             {transactions.map((trx) => {
               const walletName =
                 wallets.find((w) => w.id === trx.walletId)?.name ||
@@ -472,10 +515,22 @@ export default function Dashboard() {
                   key={trx.id}
                   className="flex justify-between items-start"
                 >
+
+                  <button class="absolute border border-gray-800 bottom-3 right-2 text-xs bg-gray-100 p-1 mx-2 rounded hover:bg-gray-200"
+                  onClick={() =>
+                      copyToClipboard(formatTransaction(trx, walletName))
+                    }>
+                    📋
+                  </button>
+                  {/* paste to clipboard */}
+
+
                   <div>
                     <p className="font-semibold text-sm">
                       {trx.title}
                     </p>
+
+                    
 
                     
 
@@ -499,6 +554,8 @@ export default function Dashboard() {
 
                   </div>
 
+                  
+
                   <p
                     className={`font-bold text-sm ${
                       trx.type === "income"
@@ -509,6 +566,8 @@ export default function Dashboard() {
                     {trx.type === "income" ? "+" : "-"} Rp{" "}
                     {Number(trx.amount).toLocaleString("id-ID")}
                   </p>
+
+                  
                 </div>
               );
             })}
@@ -612,8 +671,16 @@ export default function Dashboard() {
             {sortedMonthlyData.map((m) => (
               <div
                 key={m.id}
-                className="border rounded-xl p-3 bg-white"
+                className="relative border rounded-xl p-3 bg-white"
               >
+
+                <button class="absolute border border-gray-800 bottom-3 right-1 text-xs bg-gray-100 p-1 mx-2 rounded hover:bg-gray-200"
+                onClick={() =>
+                    copyToClipboard(formatMonthlyData(m))
+                  }>
+                    📋
+                </button>
+                {/* paste to clipboard */}
 
                 {/* MONTH */}
                 <p className="font-bold text-sm">
