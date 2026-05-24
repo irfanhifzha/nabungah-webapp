@@ -673,6 +673,12 @@ export default function Dashboard() {
                       {walletName}
                     </p>
 
+                     {trx.note && (
+                     <p className="text-xs text-black mt-2">
+                      Note: {trx.note}
+                    </p>
+                    )}
+
                   </div>
 
                   
