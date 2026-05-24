@@ -4,19 +4,25 @@ webapp untuk nabung dan monitoring keuangan lainnya
 
 TODO
 
-~~0. add limiation uang minus~~
-1. nanti add export to clipboard untuk "recent transac" and "monthly data"
-2. remove limit in recent transac and add filter month list, current month is default, bisa juga show all, and ada sumary total data?
-~~2. add fungsi tuker uang cash -> dana atau yg lain (ga keitung income)~~
-~~3. tambah goal info dan firestore connect modal~~
-~~4. tambah crud button (UTAMANYA DELETE DAN ADD) untuk recent transact and utk quick action and utk wallet~~
-5. animasi modal and aos?
-6. input click "enter" for submit/save
-7. ...
-8. how to `firestore offline - sync when online` OR change build to `react native - sync when online` OR connect to google spreadsheet?
-9. ...
-10. ...
 
+- [ ] Add modal animation and AOS support
+- [ ] Enable input submit/save on "Enter" key press
+- [ ] fix the offline firestore modes
+- [ ] ...
+- [ ] ...
+
+
+- [x] Add limitation uang minus
+- [x] Add fungsi tuker uang cash → DANA / e-wallet lain (tidak dihitung income)
+- [x] Tambah goal info dan Firestore connect modal
+- [x] Tambah CRUD button (utama: DELETE & ADD) untuk recent transactions, quick action, dan wallet
+- [x] Remove limit in recent transactions and add month filter list (default current month, bisa show all), plus summary total data
+- [x] Research Firestore offline sync / React Native sync / Google Spreadsheet integration options
+- [x] Add export to clipboard for "Recent Transactions"
+- [x] Add export to clipboard for "Monthly Data"
+
+
+---
 
 my qa
 
@@ -138,6 +144,9 @@ npm install
 npm run build
 
 npm run dev
+```
+
+---
 
 ---
 

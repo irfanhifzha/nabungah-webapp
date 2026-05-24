@@ -51,13 +51,58 @@ export default function Dashboard() {
   const [selectedGoal, setSelectedGoal] = useState(null);
   const [selectedQuickAction, setSelectedQuickAction] = useState(null);
 
+  const [copiedId, setCopiedId] = useState(null);
+
+  // filter recent transaction
+  const [trxMonthFilter, setTrxMonthFilter] = useState("all");
+  const [trxTypeFilter, setTrxTypeFilter] = useState("all");
+  const [trxLimit, setTrxLimit] = useState(10);
+
+  const filteredTransactions = useMemo(() => {
+  return transactions.filter((t) => {
+      if (!t.date?.toDate) return false;
+
+      const d = t.date.toDate();
+      const monthId = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+
+      const matchMonth =
+        trxMonthFilter === "all" || monthId === trxMonthFilter;
+
+      const matchType =
+        trxTypeFilter === "all" || t.type === trxTypeFilter;
+
+      return matchMonth && matchType;
+    });
+  }, [transactions, trxMonthFilter, trxTypeFilter]);
+
+  const displayedTransactions = useMemo(() => {
+    return filteredTransactions.slice(0, trxLimit);
+  }, [filteredTransactions, trxLimit]);
+
+  const availableMonths = useMemo(() => {
+  const set = new Set();
+
+  transactions.forEach((t) => {
+      if (!t.date?.toDate) return;
+
+      const d = t.date.toDate();
+      const id = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      set.add(id);
+    });
+
+    return ["all", ...Array.from(set).sort().reverse()];
+  }, [transactions]);
+
+
+
+
   // =========================
   // COPY TO CLIPBOARD
   // =========================
   const copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert("Copied ✅");
+      // alert("Copied ✅");
     } catch (err) {
       console.error("Copy failed:", err);
     }
@@ -68,13 +113,11 @@ export default function Dashboard() {
     const date = trx.date?.toDate ? trx.date.toDate() : new Date(trx.date);
 
     return `
-    📊 Data Transaksi
-
-    🧾 Title: ${trx.title}
-    💰 Amount: Rp ${Number(trx.amount).toLocaleString("id-ID")}
-    📌 Type: ${trx.type}
-    🏦 Wallet: ${walletName}
-    🗓️ Date: ${date.toLocaleString("id-ID", {
+*🧾 Transaksi Title: ${trx.title}*
+💰 Amount: Rp ${Number(trx.amount).toLocaleString("id-ID")}
+📌 Type: ${trx.type}
+🏦 Wallet: ${walletName}
+🗓️ Date: ${date.toLocaleString("id-ID", {
           weekday: "short",
           day: "2-digit",
           month: "2-digit",
@@ -82,24 +125,19 @@ export default function Dashboard() {
           hour: "2-digit",
           minute: "2-digit",
         })}
-    📝 Note: ${trx.note || "-"}
+📝 Note: ${trx.note || "-"}
     `.trim();
       };
 
       // FORMAT MONTHLY DATA
-      const formatMonthlyData = (m) => {
-        return `
-    📊 Data Statistik Keuangan
-
-    📅 Month: ${m.month}
-
-    💰 Total Income: Rp ${Number(m.totalIncome || 0).toLocaleString("id-ID")}
-    💸 Total Expense: Rp ${Number(m.totalExpense || 0).toLocaleString("id-ID")}
-    💼 Total Balance: Rp ${Number(m.totalBalance || 0).toLocaleString("id-ID")}
-
-    💳 Fee (${m.feePercent}%): Rp ${Number(m.feeExpense || 0).toLocaleString("id-ID")}
-
-    🕒 Updated: ${m.updatedAt?.toDate?.()?.toLocaleString("id-ID") || "-"}
+    const formatMonthlyData = (m) => {
+    return `
+*📅 Data Statistik Bulan: ${m.month}*
+💰 Total Income: Rp ${Number(m.totalIncome || 0).toLocaleString("id-ID")}
+💸 Total Expense: Rp ${Number(m.totalExpense || 0).toLocaleString("id-ID")}
+💼 Total Balance: Rp ${Number(m.totalBalance || 0).toLocaleString("id-ID")}
+💳 Fee (${m.feePercent}%): Rp ${Number(m.feeExpense || 0).toLocaleString("id-ID")}
+🕒 Updated: ${m.updatedAt?.toDate?.()?.toLocaleString("id-ID") || "-"}
     `.trim();
       };
 
@@ -110,6 +148,22 @@ export default function Dashboard() {
     });
 
     return () => unsub();
+  }, []);
+
+  // offline mode firestore
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
   }, []);
 
   // FIRESTORE
@@ -129,7 +183,6 @@ export default function Dashboard() {
     const trxRef = query(
       collection(db, "users", uid, "transactions"),
       orderBy("date", "desc"),
-      limit(20)
     );
 
     const datasRef = collection(db, "users", uid, "datas");
@@ -233,7 +286,20 @@ export default function Dashboard() {
           <div>
             <img src={Logos} className="h-[30px]"></img>
             <p className="text-sm text-gray-500">Halo <span className="font-bold">{username}</span> 👋</p>
+
+            {!isOnline && (
+            <div className="text-[10px] text-red-500 border border-gray-500 rounded-2xl p-2 mt-2">
+              You're offline — showing cached data
+            </div>
+            )}
+            
+
+
           </div>
+
+         
+            
+         
 
           <button
             onClick={handleLogout}
@@ -496,16 +562,60 @@ export default function Dashboard() {
           {transactions.length === 0 ? (
             <p className="text-sm text-gray-400">No transactions yet</p>
           ): 
+          <>
             <p className="text-[10px] text-gray-400">
-            Showing 20 latest transactions
+            Showing {displayedTransactions.length} of {filteredTransactions.length} transactions
             </p>
+
+            <div className="flex gap-2 items-center">
+
+              <select
+                value={trxMonthFilter}
+                onChange={(e) => setTrxMonthFilter(e.target.value)}
+                className="border rounded-lg px-2 py-1 text-xs bg-white"
+              >
+                {availableMonths.map((m) => (
+                  <option key={m} value={m}>
+                    {m === "all" ? "All Months ▾" : m}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={trxTypeFilter}
+                onChange={(e) => setTrxTypeFilter(e.target.value)}
+                className="border rounded-lg px-2 py-1 text-xs bg-white"
+              >
+                <option value="all">All Types ▾</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+              </select>
+
+              <select
+                value={trxLimit}
+                onChange={(e) => setTrxLimit(Number(e.target.value))}
+                className="border rounded-lg px-2 py-1 text-xs bg-white"
+              >
+                <option value={10}>10 ▾</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+
+
+            </div>
+
+
+
+
+           </>
           }
 
-          <div className="relative flex flex-col gap-3 border border-black p-4 rounded-2xl">
+          <div className="flex flex-col gap-3 rounded-2xl">
 
             
             
-            {transactions.map((trx) => {
+            {displayedTransactions.map((trx) => {
               const walletName =
                 wallets.find((w) => w.id === trx.walletId)?.name ||
                 "Unknown Wallet";
@@ -513,22 +623,33 @@ export default function Dashboard() {
               return (
                 <div
                   key={trx.id}
-                  className="flex justify-between items-start"
+                  className="relative flex border border-black justify-between items-star p-3 rounded-2xl"
                 >
 
-                  <button class="absolute border border-gray-800 bottom-3 right-2 text-xs bg-gray-100 p-1 mx-2 rounded hover:bg-gray-200"
-                  onClick={() =>
-                      copyToClipboard(formatTransaction(trx, walletName))
-                    }>
-                    📋
+                  <button
+                    className="absolute border border-gray-800 bottom-2 right-1 text-xs bg-gray-100 p-1 mx-2 rounded hover:bg-gray-200"
+                    onClick={async () => {
+                      await copyToClipboard(formatTransaction(trx, walletName));
+                      setCopiedId(trx.id);
+
+                      setTimeout(() => {
+                        setCopiedId(null);
+                      }, 1500);
+                    }}
+                  >
+                    {copiedId === trx.id ? "✔️" : "📋"}
                   </button>
                   {/* paste to clipboard */}
+
+                  
 
 
                   <div>
                     <p className="font-semibold text-sm">
                       {trx.title}
                     </p>
+
+                    
 
                     
 
@@ -674,11 +795,20 @@ export default function Dashboard() {
                 className="relative border rounded-xl p-3 bg-white"
               >
 
-                <button class="absolute border border-gray-800 bottom-3 right-1 text-xs bg-gray-100 p-1 mx-2 rounded hover:bg-gray-200"
-                onClick={() =>
-                    copyToClipboard(formatMonthlyData(m))
-                  }>
-                    📋
+                
+
+                <button
+                    className="absolute border border-gray-800 bottom-3 right-2 text-xs bg-gray-100 p-1 mx-2 rounded hover:bg-gray-200"
+                    onClick={async () => {
+                      await copyToClipboard(formatMonthlyData(m));
+                      setCopiedId(m.id);
+
+                      setTimeout(() => {
+                        setCopiedId(null);
+                      }, 1500);
+                    }}
+                  >
+                    {copiedId === m.id ? "✔️" : "📋"}
                 </button>
                 {/* paste to clipboard */}
 
